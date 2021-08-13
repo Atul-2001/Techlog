@@ -1,0 +1,138 @@
+.gutter {
+    margin-left: -16px;
+    margin-right: -16px;
+}
+
+.gutter>[class*=col-] {
+    padding-left: 16px!important;
+    padding-right: 16px!important;
+}
+
+.manual-file-chooser {
+    cursor: pointer;
+    margin-left: -80px;
+    opacity: .0001;
+    padding: 5px;
+    position: absolute;
+    width: 240px;
+}
+
+.avatar-upload .upload-state {
+    display: none;
+    padding: 10px 0;
+}
+
+.text-normal {
+    font-weight: 400 !important;
+}
+
+.button-danger {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #dc3545!important;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    background-color: #f8f9fa;
+    border: 1px solid #f8f9fa;
+    /* padding: .375rem .75rem; */
+    font-size: 1rem;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.button-danger:hover {
+    color: #dc3545;
+    background-color: #f9fafb;
+    border-color: #dc3545;
+}
+
+.alert-msg {
+    margin: 0;
+}
+
+.session-authentication {}
+
+.session-authentication .py-6 {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+}
+
+.session-authentication .mt-6 {
+    margin-top: 40px !important;
+}
+
+.form-group {
+    margin: 15px 0;
+}
+
+.form-group dt {
+    margin: 0 0 6px;
+}
+
+.form-group .form-control, .form-select {
+    background-color: var(--color-input-contrast-bg);
+    margin-right: 5px;
+    max-width: 100%;
+    width: 440px;
+}
+
+.modal-body dd .form-control[name="login"] {
+    width: 100%;
+}
+
+dd > .input-group {
+    max-width: 440px;
+}
+
+.user-profile-bio-field-container,
+.user-profile-company-field-container {
+    position: relative;
+}
+
+.form-group .form-control.user-profile-bio-field {
+    height: 5.35em;
+    min-height: 0;
+    width: 440px;
+}
+
+.note {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    margin: 4px 0 2px;
+    min-height: 17px;
+}
+
+.details-reset>summary {
+    list-style: none;
+}
+
+details summary {
+    cursor: pointer;
+}
+summary {
+    display: list-item;
+}
+
+details:not([open])>:not(summary) {
+    display: none!important;
+}
+
+.details-menu {
+    display: block;
+}
+
+.is-bad-dimensions .avatar-upload .bad-dimensions,
+.is-bad-file .avatar-upload .bad-file,
+.is-bad-format .avatar-upload .bad-format,
+.is-empty .avatar-upload .file-empty,
+.is-failed .avatar-upload .failed-request,
+.is-too-big .avatar-upload .too-big {
+    display: block;
+    margin: 0;
+}

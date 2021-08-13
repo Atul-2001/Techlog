@@ -1,0 +1,32 @@
+.Subhead {
+    border-bottom: 1px solid var(--color-border-secondary);
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+}
+
+.hx_Subhead--responsive {
+    justify-content: flex-end;
+    padding-bottom: 0;
+}
+
+.Subhead--spacious {
+    margin-top: 40px;
+}
+
+.Subhead-heading {
+    flex: 1 1 auto;
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.hx_Subhead--responsive .Subhead-heading {
+    margin-bottom: 8px;
+    order: 1;
+}
+
+.Subhead-heading--danger {
+    color: var(--color-text-danger);
+    font-weight: 600;
+}

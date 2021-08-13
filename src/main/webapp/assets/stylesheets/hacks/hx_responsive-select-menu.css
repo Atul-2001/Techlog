@@ -1,0 +1,67 @@
+.menu {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 6px;
+    list-style: none;
+    margin-bottom: 16px;
+}
+
+.menu a {
+    text-decoration: none;
+}
+
+.menu-heading {
+    border-bottom: 1px solid var(--color-border-secondary);
+    color: var(--color-menu-heading-text);
+    display: block;
+    font-size: inherit;
+    font-weight: 600;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding: 8px 16px;
+}
+
+.menu-heading:first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.menu-item {
+    border-bottom: 1px solid var(--color-border-secondary);
+    color: var(--color-text-primary);
+    display: block;
+    padding: 8px 16px;
+    position: relative;
+}
+
+.menu-item.selected,
+.menu-item[aria-current]:not([aria-current=false]),
+.menu-item[aria-selected=true] {
+    background-color: var(--color-menu-bg-active);
+    cursor: default;
+}
+
+.menu-item.selected:before,
+.menu-item[aria-current]:not([aria-current=false]):before,
+.menu-item[aria-selected=true]:before {
+    background-color: var(--color-menu-border-active);
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 2px;
+}
+
+menu a:active, menu a:hover {
+    outline-width: 0;
+}
+
+menu a:hover {
+    text-decoration: underline;
+}
+
+.menu-item:hover {
+    background-color: var(--color-state-hover-secondary-bg);
+    text-decoration: none;
+}

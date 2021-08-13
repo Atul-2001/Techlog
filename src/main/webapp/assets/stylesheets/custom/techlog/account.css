@@ -1,0 +1,82 @@
+.btn-sm {
+    padding: .25rem 1rem;
+}
+
+.form-control.is-loading {
+    padding-right: calc(1.5em + .75rem);
+    background-image: url("../../../images/spinners/Broken_circle.gif");
+    background-repeat: no-repeat;
+    background-position: right calc(.375em + .1875rem) center;
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+
+.popover {
+    background-color: var(--color-alert-error-bg);
+    border-color: var(--color-alert-error-border);
+}
+
+.bs-popover-bottom .popover-arrow::after {
+    border-bottom-color: var(--color-alert-error-bg);
+}
+
+.popover-content {
+    background-color: var(--color-alert-error-bg);
+    color: var(--color-alert-error-text);
+}
+
+/*------------------------------- Export Data ------------------------------------------------------------------------*/
+.accordion-header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    background-color: var(--color-bg-tertiary);
+    border: 0;
+    border-radius: 0;
+}
+
+.accordion-title {
+    font-size: 1rem;
+    margin: unset;
+}
+
+.accordion-body {
+    padding: unset;
+}
+
+.accordion .list-group {
+    border-radius: unset;
+}
+
+.accordion .list-group-item {
+    border-top: 1px solid rgba(0, 0, 0, .125);
+    border-bottom: unset;
+    border-left: unset;
+    border-right: unset;
+}
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+/*------------------------------- Delete User -----------------------------------------------------------------------*/
+#delete-warning-dialog .input-block {
+    display: block;
+    width: 100%;
+}
+
+.confirmation-phrase {
+    font-style: italic;
+    font-weight: 400;
+}
+
+.user-select-none {
+    -webkit-user-select: none!important;
+    -moz-user-select: none!important;
+    -ms-user-select: none!important;
+    user-select: none!important;
+}
+/*-------------------------------------------------------------------------------------------------------------------*/
