@@ -1,0 +1,17 @@
+@import url("./variables/primer-static-color.css");
+
+html {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    font-family: sans-serif;
+}
+
+body {
+    font-size: 14px;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+    text-align: center;
+}

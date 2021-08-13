@@ -1,0 +1,39 @@
+.py-6 {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+}
+
+.mt-6 {
+    margin-top: 40px !important;
+}
+
+.p-responsive {
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+}
+
+@media (min-width: 1012px) {
+    .p-responsive {
+        padding-right: 16px !important;
+        padding-left: 16px !important;
+    }
+}
+
+@media (min-width: 544px) {
+    .p-responsive {
+        padding-right: 40px !important;
+        padding-left: 40px !important;
+    }
+}
+
+.f6 {
+    font-size: 12px!important;
+}
+
+.list-style-none {
+    list-style: none!important;
+}
+
+.link--secondary {
+    color: var(--color-text-secondary)!important;
+}
