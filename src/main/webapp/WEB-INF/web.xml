@@ -76,4 +76,13 @@
         <servlet-name>Account settings</servlet-name>
         <url-pattern>/settings/admin</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Account security</servlet-name>
+        <jsp-file>/settings/security.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Account security</servlet-name>
+        <url-pattern>/settings/security</url-pattern>
+    </servlet-mapping>
 </web-app>

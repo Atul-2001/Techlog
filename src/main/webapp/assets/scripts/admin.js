@@ -52,9 +52,9 @@ if (renameForm) {
                                 throw new Error("Unknown Exception: " + response.status);
                             }
                         }).catch(error => {
-                            username.classList.remove("is-loading");
-                            console.error(error);
-                        });
+                        username.classList.remove("is-loading");
+                        console.error(error);
+                    });
                 } else {
                     popover.show();
                     inputCheckMsg.innerText = `Username ${event.target.value} is not available.`;

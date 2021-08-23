@@ -1,13 +1,9 @@
 package com.signature.techlog.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
 import com.signature.techlog.model.User;
 import com.signature.techlog.util.PasswordAuthentication;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +13,9 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 @WebServlet(name = "Delete Account Servlet", value = "/user/account/delete")
 public class DeleteAccountServlet extends HttpServlet {
@@ -78,6 +77,9 @@ public class DeleteAccountServlet extends HttpServlet {
                     }
                 }
             }
+        } catch (Exception ex) {
+            LOGGER.log(Level.ERROR, ex.getMessage(), ex);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -110,6 +112,9 @@ public class DeleteAccountServlet extends HttpServlet {
                     }
                 }
             }
+        } catch (Exception ex) {
+            LOGGER.log(Level.ERROR, ex.getMessage(), ex);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

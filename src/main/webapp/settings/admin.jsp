@@ -1,6 +1,6 @@
 <%@ page session="false" contentType="text/html;charset=UTF-8" %>
 
-<%@ taglib prefix="profile" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="admin" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="cfn" uri="/WEB-INF/tld/UserTag" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -11,7 +11,10 @@
     <c:redirect context="/" url="/"/>
 </c:if>
 
-<profile:settings title="Account settings" user="${user}" option="${AccountSettings.ACCOUNT}">
+<admin:settings
+        title="Account settings"
+        user="${user}"
+        option="${AccountSettings.ACCOUNT}">
     <jsp:attribute name="head">
         <link href="<c:url value="/assets/stylesheets/custom/techlog/account.css"/>" rel="stylesheet">
     </jsp:attribute>
@@ -200,4 +203,4 @@
     <jsp:attribute name="script">
         <script src="<c:url value="/assets/scripts/admin.js"/>" type="text/javascript"></script>
     </jsp:attribute>
-</profile:settings>
+</admin:settings>

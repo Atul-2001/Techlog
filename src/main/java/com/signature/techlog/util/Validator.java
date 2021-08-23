@@ -36,7 +36,7 @@ public class Validator {
 
     public static boolean validatePassword(String password) {
         if (password != null) {
-            return !password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*-+=()]).{8,20}$");
+            return password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*-+=()]).{8,20}$");
         } else {
             return false;
         }

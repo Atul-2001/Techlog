@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 
-@WebServlet(value = "/user/profile/*")
+@WebServlet(name = "User Profile Servlet", value = "/user/profile/*")
 public class ImageServlet extends HttpServlet {
 
     private final Logger LOGGER = LogManager.getLogger(ImageServlet.class);

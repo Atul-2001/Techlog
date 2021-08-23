@@ -95,5 +95,4 @@ public class ManageAccountServlet extends HttpServlet {
             }
         }
     }
-
 }

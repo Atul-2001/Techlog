@@ -50,6 +50,7 @@ public class UpdateProfileServlet extends HttpServlet {
             }
         } catch (Exception ex) {
             LOGGER.log(Level.ERROR, ex.getMessage(), ex);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

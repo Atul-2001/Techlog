@@ -41,7 +41,7 @@ a:active, a:hover {
     outline-width: 0;
 }
 
-.navbar-brand:hover, .btn:hover {
+.navbar a:hover, .btn:hover {
     text-decoration: none;
 }
 
@@ -94,4 +94,43 @@ a:active, a:hover {
 
 .lh-condensed {
     line-height: 1.25 !important;
+}
+
+.btn {
+    font-size: unset;
+}
+
+.form-control.is-loading {
+    padding-right: calc(1.5em + .75rem);
+    background-image: url("../../../images/spinners/Broken_circle.gif");
+    background-repeat: no-repeat;
+    background-position: right calc(.375em + .1875rem) center;
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+
+.popover {
+    background-color: var(--color-bg-canvas);
+    background-image: linear-gradient(var(--color-input-tooltip-error-bg),var(--color-input-tooltip-error-bg));
+    border-color: var(--color-input-tooltip-error-border);
+    color: var(--color-input-tooltip-error-text);
+    border-radius: 6px;
+    border-style: solid;
+    border-width: 1px;
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    margin: 8px 0 0;
+    max-width: 450px;
+    padding: 4px 8px;
+    position: absolute;
+    z-index: 10;
+}
+
+.bs-popover-bottom .popover-arrow::after {
+    border-bottom-color: var(--color-alert-error-bg);
+}
+
+.popover-body {
+    padding: unset;
+    color: unset;
 }

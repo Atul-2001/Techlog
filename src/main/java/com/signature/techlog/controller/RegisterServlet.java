@@ -55,10 +55,10 @@ public class RegisterServlet extends HttpServlet {
                         .setLevel(Message.Level.WARNING)
                         .setContent("Please select your country!")
                         .toJSON());
-            } else if (Validator.validatePassword(password)) {
+            } else if (!Validator.validatePassword(password)) {
                 out.print(Message.builder()
                         .setLevel(Message.Level.WARNING)
-                        .setContent("Password length should be between 8 to 20 characters. " +
+                        .setContent("Password length should be between 8 to 64 characters. " +
                                 "It should contain at least one uppercase letter(A-Z), " +
                                 "one lowercase letter(a-z), one digit(0-9) and " +
                                 "one special character.")

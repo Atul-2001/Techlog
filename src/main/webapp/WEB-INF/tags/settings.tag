@@ -44,7 +44,7 @@
                             <span class="menu-heading">Account settings</span>
                             <a id="PROFILE" class="menu-item" data-selected-links="/settings/profile" href="<c:url value="/settings/profile"/>">Profile</a>
                             <a id="ACCOUNT" class="menu-item" data-selected-links="/settings/admin" href="<c:url value="/settings/admin"/>">Account</a>
-                            <a id="ACCOUNT_SECURITY" class="menu-item" data-selected-links="" href="">Account security</a>
+                            <a id="ACCOUNT_SECURITY" class="menu-item" data-selected-links="/settings/security" href="<c:url value="/settings/security"/>">Account security</a>
                             <a id="NOTIFICATIONS" class="menu-item" data-selected-links="" href="">Notifications</a>
                             <a id="YOUR_BLOGS" class="menu-item" data-selected-links="" href="">Your blogs</a>
                             <a id="HISTORY" class="menu-item" data-selected-links="" href="">History</a>

@@ -84,6 +84,7 @@ public class GoogleAuthentication extends HttpServlet {
             }
         } catch (IOException ex) {
             LOGGER.log(Level.ERROR, ex.getMessage(), ex);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -2,28 +2,6 @@
     padding: .25rem 1rem;
 }
 
-.form-control.is-loading {
-    padding-right: calc(1.5em + .75rem);
-    background-image: url("../../../images/spinners/Broken_circle.gif");
-    background-repeat: no-repeat;
-    background-position: right calc(.375em + .1875rem) center;
-    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
-}
-
-.popover {
-    background-color: var(--color-alert-error-bg);
-    border-color: var(--color-alert-error-border);
-}
-
-.bs-popover-bottom .popover-arrow::after {
-    border-bottom-color: var(--color-alert-error-bg);
-}
-
-.popover-content {
-    background-color: var(--color-alert-error-bg);
-    color: var(--color-alert-error-text);
-}
-
 /*------------------------------- Export Data ------------------------------------------------------------------------*/
 .accordion-header {
     position: relative;

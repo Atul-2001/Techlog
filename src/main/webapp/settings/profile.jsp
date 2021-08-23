@@ -239,7 +239,7 @@
                                            style="cursor: pointer;" role="menuitem" tabindex="0">
                                         Upload a photo…
                                     </label>
-                                    <c:if test="${!fn:contains(user.profile, '/icons/')}">
+                                    <c:if test="${!fn:contains(user.profile, '/assets/')}">
                                         <form id="reset-avatar-form" action="<c:url value="/settings/reset_avatar"/>"
                                               accept-charset="UTF-8" method="post">
                                             <button class="btn-link dropdown-item js-detect-gravatar"

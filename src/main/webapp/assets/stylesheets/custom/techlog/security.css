@@ -1,0 +1,41 @@
+.form-group {
+    margin: 15px 0;
+}
+
+.form-group dt {
+    margin: 0 0 6px;
+}
+
+dt label {
+    font-weight: 600;
+}
+
+.form-group label {
+    position: static;
+}
+
+.form-group .form-control {
+    background-color: var(--color-input-contrast-bg);
+    margin-right: 5px;
+    max-width: 100%;
+    width: 440px;
+}
+
+.form-control.is-loading {
+    padding-right: calc(1.5em + .75rem);
+    background-image: url("../../../images/spinners/Broken_circle.gif");
+    background-repeat: no-repeat;
+    background-position: right calc(.375em + .1875rem) center;
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+
+p {
+    margin-top: 0.25rem;
+}
+
+.note {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    margin: 4px 0 2px;
+    min-height: 17px;
+}
