@@ -1,30 +1,57 @@
 package com.signature.techlog.model;
 
-import com.sun.istack.NotNull;
-import jakarta.persistence.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import com.signature.techlog.bootstrap.ApplicationContext;
+import com.signature.techlog.catalog.AccountType;
+import com.signature.techlog.catalog.ContactType;
+import com.signature.techlog.catalog.Gender;
+import com.signature.techlog.model.base.TimestampEntity;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.MapKeyEnumerated;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.io.File;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
-public class User implements Serializable {
+@Cacheable
+@Table(name = "USERS")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class User extends TimestampEntity {
 
     @Transient
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name = "USER_ID")
-    private String id;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ACCOUNT_TYPE", nullable = false)
+    private AccountType accountType;
 
-    @Column(name = "PROFILE")
-    private String profile;
+    @NotNull
+    @Column(name = "HOME_DIRECTORY", nullable = false, updatable = false)
+    private String homeDirectory;
 
     @NotNull
     @Column(name = "NAME", nullable = false)
@@ -46,208 +73,93 @@ public class User implements Serializable {
     @Column(name = "IS_EMAIL_PRIVATE", nullable = false)
     private boolean isEmailPrivate;
 
-    @Column(name = "PASSWORD")
+    @Column(name = "PASSWORD", length = 64)
     private String password;
 
-    @Column(name = "PHONE", length = 16)
+    @Column(name = "PHONE", length = 15)
     private String phone;
 
-    @Column(name = "GENDER", length = 20)
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "GENDER", length = 15)
+    private Gender gender;
 
     @Column(name = "DATE_OF_BIRTH")
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
-    @Column(name = "COUNTRY", length = 50)
+    @Column(name = "COUNTRY", length = 100)
     private String country;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @Column(name = "PROFESSION_OR_SKILL")
-    @CollectionTable(
-            name = "User_ProfessionOrSkills",
-            joinColumns = @JoinColumn(name = "USER")
-    )
-    private List<String> professionOrSkills;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @Column(name = "CONTACT")
-    @CollectionTable(
-            name = "USER_CONTACTS",
-            joinColumns = @JoinColumn(name = "USER")
-    )
-    private Map<ContactType, String> contacts;
+    @Column(name = "PROFILE")
+    private String profile;
 
     @Column(name = "ABOUT")
     private String about;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
+    @ElementCollection
+    @MapKeyColumn(name = "TYPE")
+    @MapKeyEnumerated(EnumType.STRING)
+    @CollectionTable(name = "CONTACTS", joinColumns = @JoinColumn(name = "USER", referencedColumnName = "ID"))
+    @AttributeOverride(name = "value.String", column = @Column(name = "VALUE", nullable = false))
+    private Map<ContactType, String> contacts;
+
+    @ManyToMany
     @JoinTable(
-            name = "USER_BLOG",
-            joinColumns = @JoinColumn(name = "USER"),
-            inverseJoinColumns = @JoinColumn(name = "BLOG")
+            name = "RELATIONS",
+            joinColumns = @JoinColumn(name = "FOLLOWER", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "FOLLOWING", referencedColumnName = "ID")
     )
-    private List<Blog> blogs;
+    @OrderBy(value = " NAME ASC ")
+    private Set<User> following;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinTable(
-            name = "USER_FOLLOWER",
-            joinColumns = @JoinColumn(name = "USER"),
-            inverseJoinColumns = @JoinColumn(name = "FOLLOWER")
-    )
-    private List<User> followers;
+    @ManyToMany(mappedBy = "FOLLOWING")
+    @OrderBy(value = " NAME ASC ")
+    private Set<User> followers;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinTable(
-            name = "USER_FOLLOWING",
-            joinColumns = @JoinColumn(name = "USER"),
-            inverseJoinColumns = @JoinColumn(name = "FOLLOWED")
-    )
-    private List<User> following;
+    @OneToMany(mappedBy = "USER")
+    @OrderBy(value = " TIMESTAMP DESC ")
+    private Set<Blog> blogs;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinTable(
-            name = "USER_REACTION",
-            joinColumns = @JoinColumn(name = "USER"),
-            inverseJoinColumns = @JoinColumn(name = "REACTION")
-    )
-    private List<Reaction> reactions;
+    @OneToMany(mappedBy = "USER")
+    @OrderBy(value = " TIMESTAMP DESC ")
+    private Set<Reaction> reactions;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinTable(
-            name = "USER_COMMENT",
-            joinColumns = @JoinColumn(name = "USER"),
-            inverseJoinColumns = @JoinColumn(name = "COMMENT")
-    )
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "USER")
+    @OrderBy(value = " TIMESTAMP DESC ")
+    private Set<Comment> comments;
 
-    @NotNull
-    @Column(name = "CONTENT_DIRECTORY", nullable = false)
-    private String contentDirectory;
-
-    @OneToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinTable(
-            name = "USER_ARCHIVE",
-            joinColumns = @JoinColumn(name = "USER"),
-            inverseJoinColumns = @JoinColumn(name = "ARCHIVE")
-    )
-    private List<Archive> requestedDataArchives;
-
-    @NotNull
-    @Column(name = "TIMESTAMP", nullable = false)
-    private final Timestamp timestamp;
-
-    public enum ContactType {
-        YOUTUBE,
-        FACEBOOK,
-        INSTAGRAM,
-        TWITTER
-    }
+    @OneToMany(mappedBy = "USER")
+    @OrderBy(value = " TIMESTAMP ASC ")
+    private Set<Archive> archives;
 
     public User() {
-        this.professionOrSkills = new ArrayList<>();
         this.contacts = new HashMap<>();
-        this.blogs = new ArrayList<>();
-        this.followers = new ArrayList<>();
-        this.following = new ArrayList<>();
-        this.contentDirectory = System.getProperty("user.home")
-                .concat(File.separator).concat("Techlog")
-                .concat(File.separator).concat("user")
-                .concat(File.separator).concat(String.valueOf(id))
-                .concat(File.separator);
-        this.reactions = new ArrayList<>();
-        this.comments = new ArrayList<>();
-        this.requestedDataArchives = new ArrayList<>();
-        this.timestamp = Timestamp.from(Instant.now());
+        this.followers = new HashSet<>();
+        this.following = new HashSet<>();
+        this.blogs = new HashSet<>();
+        this.reactions = new HashSet<>();
+        this.comments = new HashSet<>();
+        this.archives = new HashSet<>();
     }
 
-    public User(BigInteger id, String profile, String name, String email, String password, String phone, String gender, Date dateOfBirth, String country, String about) {
-        this.id = id.toString();
-        switch (gender) {
-            case "FEMALE":
-                this.profile = "/assets/images/user_icon/female-user.svg";
-                break;
-            case "MALE":
-                this.profile = "/assets/images/user_icon/male-user.svg";
-                break;
-            case "TRANSGENDER":
-                this.profile = "/assets/images/user_icon/transgender-user.svg";
-                break;
-            default:
-                this.profile = profile;
-                break;
-        }
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.gender = gender;
-        this.dateOfBirth = dateOfBirth;
-        this.country = country;
-        this.professionOrSkills = new ArrayList<>();
-        this.contacts = new HashMap<>();
-        this.about = about;
-        this.blogs = new ArrayList<>();
-        this.followers = new ArrayList<>();
-        this.following = new ArrayList<>();
-        this.contentDirectory = System.getProperty("user.home")
-                .concat(File.separator).concat("Techlog")
-                .concat(File.separator).concat("user")
-                .concat(File.separator).concat(String.valueOf(id))
-                .concat(File.separator);
-        this.reactions = new ArrayList<>();
-        this.comments = new ArrayList<>();
-        this.requestedDataArchives = new ArrayList<>();
-        this.timestamp = Timestamp.from(Instant.now());
+    @PrePersist
+    private void updateHomeDirectory() {
+        this.homeDirectory = ApplicationContext.getProperties().getProperty("app.user.dir").concat(File.separator).concat(super.getId());
     }
 
-    public User(BigInteger id, String name, String email, String password, String gender, String country) {
-        this(id, null, name, email, password, null, gender, null, country, null);
+    public AccountType getAccountType() {
+        return accountType;
     }
 
-    public User(BigInteger id, String name, String email, String profile) {
-        this(id, profile, name, email, null, null, "", null, null, null);
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
     }
 
-    public User(BigInteger id, String name, String profile) {
-        this(id, name, null, profile);
+    public String getHomeDirectory() {
+        return homeDirectory;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-        this.contentDirectory = System.getProperty("user.home")
-                .concat(File.separator).concat("Techlog")
-                .concat(File.separator).concat("user")
-                .concat(File.separator).concat(id)
-                .concat(File.separator);
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id.toString();
-        this.contentDirectory = System.getProperty("user.home")
-                .concat(File.separator).concat("Techlog")
-                .concat(File.separator).concat("user")
-                .concat(File.separator).concat(String.valueOf(id))
-                .concat(File.separator);
-    }
-
-    public String getProfile() {
-        return profile;
-    }
-
-    public void setProfile(String profile) {
-        this.profile = profile;
+    public void setHomeDirectory(String homeDirectory) {
+        this.homeDirectory = homeDirectory;
     }
 
     public String getName() {
@@ -306,19 +218,19 @@ public class User implements Serializable {
         this.phone = phone;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -330,44 +242,12 @@ public class User implements Serializable {
         this.country = country;
     }
 
-    public List<String> getProfessionOrSkills() {
-        return professionOrSkills;
+    public String getProfile() {
+        return profile;
     }
 
-    public void setProfessionOrSkills(List<String> professionOrSkills) {
-        this.professionOrSkills = professionOrSkills;
-    }
-
-    public void addProfessionOrSkills(String professionOrSkill) {
-        this.professionOrSkills.add(professionOrSkill);
-    }
-
-    public void removeProfessionOrSkill(String professionOrSkill) {
-        this.professionOrSkills.remove(professionOrSkill);
-    }
-
-    public Map<ContactType, String> getContacts() {
-        return contacts;
-    }
-
-    public void setContacts(Map<ContactType, String> contacts) {
-        this.contacts = contacts;
-    }
-
-    public String getContact(ContactType key) {
-        return this.contacts.get(key);
-    }
-
-    public void addContact(ContactType key, String contact) {
-        this.contacts.put(key, contact);
-    }
-
-    public void removeContact(ContactType key) {
-        this.contacts.remove(key);
-    }
-
-    public void replaceContact(ContactType key, String newContact) {
-        this.contacts.replace(key, newContact);
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
     public String getAbout() {
@@ -378,135 +258,96 @@ public class User implements Serializable {
         this.about = about;
     }
 
-    public List<Blog> getBlogs() {
-        return blogs;
+    public Map<ContactType, String> getContacts() {
+        return contacts;
     }
 
-    public void setBlogs(List<Blog> blogs) {
-        this.blogs = blogs;
+    public void setContacts(Map<ContactType, String> contacts) {
+        this.contacts = contacts;
     }
 
-    public void addBlog(Blog blog) {
-        this.blogs.add(blog);
-    }
-
-    public void removeBlog(Blog blog) {
-        this.blogs.remove(blog);
-    }
-
-    public List<User> getFollowers() {
-        return followers;
-    }
-
-    public void setFollowers(List<User> followers) {
-        this.followers = followers;
-    }
-
-    public void addFollower(User follower) {
-        this.followers.add(follower);
-    }
-
-    public void removeFollower(User follower) {
-        this.followers.remove(follower);
-    }
-
-    public List<User> getFollowing() {
+    public Set<User> getFollowing() {
         return following;
     }
 
-    public void setFollowing(List<User> following) {
+    public void setFollowing(Set<User> following) {
         this.following = following;
     }
 
-    public void addFollowing(User user) {
-        this.following.add(user);
+    public Set<User> getFollowers() {
+        return followers;
     }
 
-    public void removeFollowing(User user) {
-        this.following.remove(user);
+    public void setFollowers(Set<User> followers) {
+        this.followers = followers;
     }
 
-    public List<Reaction> getReactions() {
+    public Set<Blog> getBlogs() {
+        return blogs;
+    }
+
+    public void setBlogs(Set<Blog> blogs) {
+        this.blogs = blogs;
+    }
+
+    public Set<Reaction> getReactions() {
         return reactions;
     }
 
-    public void setReactions(List<Reaction> reactions) {
+    public void setReactions(Set<Reaction> reactions) {
         this.reactions = reactions;
     }
 
-    public void addReaction(Reaction reaction) {
-        this.reactions.add(reaction);
-    }
-
-    public void removeReaction(Reaction reaction) {
-        this.reactions.remove(reaction);
-    }
-
-    public List<Comment> getComments() {
+    public Set<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<Comment> comments) {
+    public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 
-    public void addComment(Comment comment) {
-        this.comments.add(comment);
+    public Set<Archive> getArchives() {
+        return archives;
     }
 
-    public void removeComment(Comment comment) {
-        this.comments.remove(comment);
-    }
-
-    public String getContentDirectory() {
-        return contentDirectory;
-    }
-
-    public List<Archive> getRequestedDataArchives() {
-        return requestedDataArchives;
-    }
-
-    public void setRequestedDataArchives(List<Archive> requestedDataArchives) {
-        this.requestedDataArchives = requestedDataArchives;
-    }
-
-    public Timestamp getTimestamp() {
-        return timestamp;
+    public void setArchives(Set<Archive> archives) {
+        this.archives = archives;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id);
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        User user = (User) obj;
+        return Objects.equals(super.getId(), user.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(super.getId());
     }
 
     @Override
     public String toString() {
         return "User {" +
-                "\n\tid='" + id + '\'' +
-                "\n\tname='" + name + '\'' +
-                "\n\tusername='" + username + '\'' +
-                "\n\temail='" + email + '\'' +
-                "\n\tisEmailVerified=" + isEmailVerified +
-                "\n\tisEmailPrivate=" + isEmailPrivate +
-                "\n\tphone='" + phone + '\'' +
-                "\n\tgender='" + gender + '\'' +
-                "\n\tdateOfBirth=" + dateOfBirth +
-                "\n\tcountry='" + country + '\'' +
-                "\n\tblogs=" + blogs.size() +
-                "\n\tfollowers=" + followers.size() +
-                "\n\tfollowing=" + following.size() +
-                "\n\treactions=" + reactions.size() +
-                "\n\tcomments=" + comments.size() +
-                "\n\tcontentDirectory='" + contentDirectory + '\'' +
-                "\n\ttimestamp=" + timestamp +
+                "\n\tid: " + super.getId() +
+                "\n\ttype: " + accountType.name() +
+                "\n\tname: " + name +
+                "\n\tusername: " + username +
+                "\n\temail: " + email +
+                "\n\tisEmailVerified: " + isEmailVerified +
+                "\n\tisEmailPrivate: " + isEmailPrivate +
+                "\n\tphone: " + phone +
+                "\n\tgender: " + gender +
+                "\n\tdateOfBirth: " + dateOfBirth +
+                "\n\tcountry: " + country +
+                "\n\tfollowers: " + followers.size() +
+                "\n\tfollowing: " + following.size() +
+                "\n\tblogs: " + blogs.size() +
+                "\n\treactions: " + reactions.size() +
+                "\n\tcomments: " + comments.size() +
+                "\n\tcontentDirectory: " + homeDirectory +
+                "\n\ttimestamp: " + super.getTimestamp() +
                 "\n}";
     }
 }

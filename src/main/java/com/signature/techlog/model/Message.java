@@ -4,7 +4,7 @@ public class Message {
 
     private Level level;
     private String content;
-    private String redirectURI;
+    private String redirect;
 
     public enum Level {
         ALL,
@@ -40,17 +40,17 @@ public class Message {
         return this;
     }
 
-    public String getRedirectURI() {
-        return redirectURI;
+    public String getRedirect() {
+        return redirect;
     }
 
-    public Message setRedirectURI(String redirectURI) {
-        this.redirectURI = redirectURI;
+    public Message setRedirect(String redirect) {
+        this.redirect = redirect;
         return this;
     }
 
     public String toJSON() {
-        if (redirectURI == null || redirectURI.isEmpty()) {
+        if (redirect == null || redirect.isEmpty()) {
             return "{" +
                     "\"level\":\"" + level.name() + "\"," +
                     "\"content\":\"" + content + "\"" +
@@ -59,7 +59,7 @@ public class Message {
             return "{" +
                     "\"level\":\"" + level.name() + "\"," +
                     "\"content\":\"" + content + "\"," +
-                    "\"redirectURI\":\"" + redirectURI + "\"" +
+                    "\"redirect\":\"" + redirect + "\"" +
                     "}";
         }
     }

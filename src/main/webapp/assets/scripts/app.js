@@ -99,18 +99,18 @@ const loginMsg = document.querySelector("#login-alert");
 const loginBtn = loginForm.elements.namedItem("login");
 const loginBtnSpinner = loginBtn.children[0];
 
-function resetLoginMsgBanner() {
+function prepareLoginEvent() {
+    loginBtn.disabled = true;
+    loginBtnSpinner.classList.remove("d-none");
+
     loginMsg.classList.remove("d-none", "alert-success", "alert-danger", "alert-warning");
-    loginMsg.classList.toggle("d-none");
+    loginMsg.classList.add("d-none");
 }
 
-loginForm.addEventListener('submit', async function (event) {
+loginForm.addEventListener('submit', function (event) {
     event.preventDefault();
 
-    loginBtn.disabled = true;
-    loginBtnSpinner.classList.toggle("d-none");
-
-    resetLoginMsgBanner();
+    prepareLoginEvent();
 
     fetch('/ajax/login', {
         method: "POST",
@@ -119,35 +119,49 @@ loginForm.addEventListener('submit', async function (event) {
         .then(response => response.json())
         .then(result => {
             showLoginResult(result);
-
-            loginBtn.disabled = false;
-            loginBtnSpinner.classList.toggle("d-none");
         }).catch(error => {
-        console.error(error);
-        loginMsg.classList.toggle("alert-danger");
-        loginMsg.innerHTML = "Something went wrong, please try again!";
-        loginMsg.classList.toggle("d-none");
-        loginBtn.disabled = false;
-        loginBtnSpinner.classList.toggle("d-none");
-    });
+            handleAjaxError(error, loginMsg, loginBtn, loginBtnSpinner);
+        });
 });
+
+function handleCredentialResponseFromGoogleLogin(googleUser) {
+    prepareLoginEvent();
+
+    fetch('/oauth/google/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({'credential': googleUser.credential})
+    })
+        .then(response => response.json())
+        .then(result => {
+            showLoginResult(result);
+        })
+        .catch(error => {
+            handleAjaxError(error, loginMsg, loginBtn, loginBtnSpinner);
+        });
+}
 
 function showLoginResult(result) {
     loginMsg.innerHTML = result.content;
     if (result.level === Level.INFO) {
-        loginMsg.classList.toggle("alert-success");
+        loginMsg.classList.add("alert-success");
         setTimeout(function () {
-            window.location.href = "home";
+            window.location.href = result.redirect;
         }, 1000);
     } else if (result.level === Level.WARN) {
-        loginMsg.classList.toggle("alert-warning");
+        loginMsg.classList.add("alert-warning");
     } else if (result.level === Level.ERROR) {
-        loginMsg.classList.toggle("alert-danger");
+        loginMsg.classList.add("alert-danger");
     } else {
-        loginMsg.classList.toggle("alert-danger");
+        loginMsg.classList.add("alert-danger");
         loginMsg.innerHTML = "Something went wrong, please try again!";
     }
-    loginMsg.classList.toggle("d-none");
+    loginMsg.classList.remove("d-none");
+
+    loginBtn.disabled = false;
+    loginBtnSpinner.classList.add("d-none");
 }
 
 const registerForm = document.querySelector(".sign-up-form");
@@ -155,18 +169,18 @@ const registerMsg = document.querySelector("#register-alert");
 const registerBtn = registerForm.elements.namedItem("register");
 const registerBtnSpinner = registerBtn.children[0];
 
-function resetRegisterMsgBanner() {
+function prepareRegisterEvent() {
+    registerBtn.disabled = true;
+    registerBtnSpinner.classList.remove("d-none");
+
     registerMsg.classList.remove("d-none", "alert-success", "alert-danger", "alert-warning");
-    registerMsg.classList.toggle("d-none");
+    registerMsg.classList.add("d-none");
 }
 
 registerForm.addEventListener('submit', async function (event) {
     event.preventDefault();
 
-    registerBtn.disabled = true;
-    registerBtnSpinner.classList.toggle("d-none");
-
-    resetRegisterMsgBanner();
+    prepareRegisterEvent();
 
     const formData = new FormData(event.target);
     fetch('/ajax/register', {
@@ -175,40 +189,13 @@ registerForm.addEventListener('submit', async function (event) {
     })
         .then(response => response.json())
         .then(result => {
-            registerMsg.innerHTML = result.content;
-            if (result.level === Level.INFO) {
-                registerMsg.classList.toggle("alert-success");
-                adjustView();
-                setInterval(function () {
-                    loginForm.elements.email.value = formData.get("email");
-                    container.classList.remove("sign-up-mode");
-                }, 1000);
-            } else if (result.level === Level.WARN) {
-                registerMsg.classList.toggle("alert-warning");
-                adjustView();
-                if (window.matchMedia("(max-width: 870px)").matches && result.content.startsWith("Password length")) {
-                    container.style.height = "152vh";
-                }
-            } else if (result.level === Level.ERROR) {
-                registerMsg.classList.toggle("alert-danger");
-                adjustView();
-            } else {
-                registerMsg.classList.toggle("alert-danger");
-                registerMsg.innerHTML = "Something went wrong, please try again!";
-                adjustView();
-            }
-
-            registerMsg.classList.toggle("d-none");
-
-            registerBtn.disabled = false;
-            registerBtnSpinner.classList.toggle("d-none");
+            showRegisterResult(result, function () {
+                loginForm.elements.email.value = formData.get("email");
+                container.classList.remove("sign-up-mode");
+            });
         })
         .catch(error => {
-            console.error(error);
-            registerMsg.classList.toggle("alert-danger");
-            registerMsg.innerHTML = "Something went wrong, please try again!";
-            registerBtn.disabled = false;
-            registerBtnSpinner.classList.toggle("d-none");
+            handleAjaxError(error, registerMsg, registerBtn, registerBtnSpinner);
             adjustView();
         });
 });
@@ -225,116 +212,62 @@ function adjustView() {
     }
 }
 
-/* --------------------------------- Social Authentication --------------------------------------------- */
-/*---------------------------------- Google Authentication Start ----------------------------------------*/
-let googleUser = {};
-let auth2;
+function handleCredentialResponseFromGoogleRegister(googleUser) {
+    prepareRegisterEvent();
 
-window.onLoadCallback = function () {
-    gapi.load('auth2', function () {
-        // Retrieve the singleton for the GoogleAuth library and set up the client.
-        auth2 = gapi.auth2.init({
-            client_id: '[YOUR CLIENT ID]',
-            cookiepolicy: 'single_host_origin',
-            // Request scopes in addition to 'profile' and 'email'
-            //scope: 'additional_scope'
-        });
-        attachSignInBtn(document.getElementById('google-sign-in-btn'));
-        attachSignUpBtn(document.getElementById('google-sign-up-btn'));
-    });
-}
-
-function attachSignInBtn(element) {
-    auth2.attachClickHandler(element, {},
-        function (googleUser) {
-            loginBtn.disabled = true;
-            loginBtnSpinner.classList.toggle("d-none");
-
-            resetLoginMsgBanner();
-
-            let id_token = googleUser.getAuthResponse().id_token;
-            fetch('/auth/google', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({'id_token': id_token})
-            })
-                .then(response => response.json())
-                .then(result => {
-                    showLoginResult(result);
-                    loginBtn.disabled = false;
-                    loginBtnSpinner.classList.toggle("d-none");
-                })
-                .catch(error => {
-                    console.error(error);
-                    loginMsg.classList.toggle("alert-danger");
-                    loginMsg.innerHTML = "Something went wrong, please try again!";
-                    loginMsg.classList.toggle("d-none");
-                    loginBtn.disabled = false;
-                    loginBtnSpinner.classList.toggle("d-none");
-                });
-        }, function (error) {
-            alert(JSON.stringify(error, undefined, 2));
+    fetch('/oauth/google/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({'credential': googleUser.credential})
+    })
+        .then(response => response.json())
+        .then(result => {
+            registerMsg.classList.remove("alert-primary");
+            registerMsg.classList.add("d-none");
+            showRegisterResult(result, function () {
+                window.location.href = result.redirect;
+            });
+        })
+        .catch(error => {
+            handleAjaxError(error, registerMsg, registerBtn, registerBtnSpinner);
+            adjustView();
         });
 }
 
-function attachSignUpBtn(element) {
-    auth2.attachClickHandler(element, {},
-        function (googleUser) {
-            registerBtn.disabled = true;
-            registerBtnSpinner.classList.toggle("d-none");
+function showRegisterResult(result, successCallback) {
+    registerMsg.innerHTML = result.content;
+    if (result.level === Level.INFO) {
+        registerMsg.classList.add("alert-success");
+        adjustView();
+        setTimeout(successCallback, 1000);
+    } else if (result.level === Level.WARN) {
+        registerMsg.classList.add("alert-warning");
+        adjustView();
+        if (window.matchMedia("(max-width: 870px)").matches && result.content.startsWith("Password length")) {
+            container.style.height = "152vh";
+        }
+    } else if (result.level === Level.ERROR) {
+        registerMsg.classList.add("alert-danger");
+        adjustView();
+    } else {
+        registerMsg.classList.add("alert-danger");
+        registerMsg.innerHTML = "Something went wrong, please try again!";
+        adjustView();
+    }
 
-            resetRegisterMsgBanner();
+    registerMsg.classList.remove("d-none");
 
-            let id_token = googleUser.getAuthResponse().id_token;
-            fetch('/auth/google', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({'id_token': id_token})
-            })
-                .then(response => response.json())
-                .then(result => {
-                    registerMsg.innerHTML = result.content;
-                    if (result.level === Level.INFO) {
-                        registerMsg.classList.toggle("alert-success");
-                        adjustView();
-                        setTimeout(function () {
-                            window.location.href = "home";
-                        }, 1000);
-                    } else if (result.level === Level.WARN) {
-                        registerMsg.classList.toggle("alert-warning");
-                        adjustView();
-                        if (window.matchMedia("(max-width: 870px)").matches && result.content.startsWith("Password length")) {
-                            container.style.height = "152vh";
-                        }
-                    } else if (result.level === Level.ERROR) {
-                        registerMsg.classList.toggle("alert-danger");
-                        adjustView();
-                    } else {
-                        registerMsg.classList.toggle("alert-danger");
-                        registerMsg.innerHTML = "Something went wrong, please try again!";
-                        adjustView();
-                    }
-
-                    registerMsg.classList.toggle("d-none");
-
-                    registerBtn.disabled = false;
-                    registerBtnSpinner.classList.toggle("d-none");
-                })
-                .catch(error => {
-                    console.error(error);
-                    registerMsg.classList.toggle("alert-danger");
-                    registerMsg.innerHTML = "Something went wrong, please try again!";
-                    registerBtn.disabled = false;
-                    registerBtnSpinner.classList.toggle("d-none");
-                    adjustView();
-                });
-        }, function (error) {
-            alert(JSON.stringify(error, undefined, 2));
-        });
+    registerBtn.disabled = false;
+    registerBtnSpinner.classList.add("d-none");
 }
-/*---------------------------------- Google Authentication End ------------------------------------------*/
-/* --------------------------------- Social Authentication --------------------------------------------- */
+
+function handleAjaxError(error, alert, btn, btnSpinner) {
+    console.error(error);
+    alert.classList.add("alert-danger");
+    alert.innerHTML = "Something went wrong, please try again!";
+    alert.classList.remove("d-none");
+    btn.disabled = false;
+    btnSpinner.classList.add("d-none");
+}

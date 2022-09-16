@@ -22,22 +22,6 @@
     <jsp:invoke fragment="head"/>
     <script src="<c:url value="/assets/scripts/level.js"/>"></script>
     <script src="https://kit.fontawesome.com/4418ec4da8.js" crossorigin="anonymous"></script>
-    <script src="https://apis.google.com/js/api:client.js" async defer></script>
-    <script>
-        window.onload = function () {
-            gapi.load('auth2', function () {
-                auth2 = gapi.auth2.init({
-                    client_id: '[YOUR CLIENT ID]',
-                    cookiepolicy: 'single_host_origin',
-                });
-            });
-        };
-
-        function signOut() {
-            const auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut();
-        }
-    </script>
 </head>
 <body>
 

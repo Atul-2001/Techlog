@@ -1,73 +1,48 @@
 package com.signature.techlog.model;
 
-import com.sun.istack.NotNull;
-import jakarta.persistence.*;
+import com.signature.techlog.catalog.ReactionType;
+import com.signature.techlog.model.base.TimestampEntity;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.Objects;
 
 @Entity
-public class Reaction implements Serializable {
+@Cacheable
+@Table(name = "REACTIONS")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class Reaction extends TimestampEntity {
 
     @Transient
     private static final long serialVersionUID = 3L;
 
-    @Transient
-    private static long REACTION_COUNT = 1;
-
-    @Id
-    @Column(name = "REACTION_ID")
-    private long id;
-
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "USER", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column(name = "USER", nullable = false, updatable = false)
     private User user;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "BLOG", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column(name = "BLOG", nullable = false, updatable = false)
     private Blog blog;
 
     @NotNull
-    @Column(name = "REACTION", nullable = false)
-    private React reaction;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TYPE", nullable = false)
+    private ReactionType type;
 
-    @NotNull
-    @Column(name = "REACTION_TIME", nullable = false)
-    private final Timestamp reactionTime;
-
-    public enum React {
-        UNDEFINED,
-        LIKE,
-        DISLIKE
-    }
-
-    public Reaction() {
-        this.reaction = React.UNDEFINED;
-        this.reactionTime = Timestamp.from(Instant.now());
-    }
-
-    public Reaction(User user, Blog blog, React reaction) {
-        this.id = REACTION_COUNT++;
-        this.user = user;
-        this.blog = blog;
-        this.reaction = reaction;
-        this.reactionTime = Timestamp.from(Instant.now());
-    }
-
-    public static void setReactionCount(long count) {
-        Reaction.REACTION_COUNT = count;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    public Reaction() { }
 
     public User getUser() {
         return user;
@@ -85,15 +60,24 @@ public class Reaction implements Serializable {
         this.blog = blog;
     }
 
-    public React getReaction() {
-        return reaction;
+    public ReactionType getType() {
+        return type;
     }
 
-    public void setReaction(React reaction) {
-        this.reaction = reaction;
+    public void setType(ReactionType type) {
+        this.type = type;
     }
 
-    public Timestamp getReactionTime() {
-        return reactionTime;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reaction reaction = (Reaction) o;
+        return Objects.equals(super.getId(), reaction.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.getId());
     }
 }

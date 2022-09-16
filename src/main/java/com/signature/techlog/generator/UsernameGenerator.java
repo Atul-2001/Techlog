@@ -1,13 +1,14 @@
 package com.signature.techlog.generator;
 
-import com.signature.techlog.data.UserHandler;
+import com.signature.techlog.repository.UserRepository;
+import com.signature.techlog.repository.impl.UserRepositoryImpl;
 import com.signature.techlog.util.Validator;
 
 import java.security.SecureRandom;
 
 public class UsernameGenerator {
 
-    private static final UserHandler handler = UserHandler.getInstance();
+    private static final UserRepository handler = UserRepositoryImpl.getInstance();
 
     public static String generate(String email) throws InvalidEmailException {
         if (Validator.validateEmail(email)) {
@@ -21,7 +22,7 @@ public class UsernameGenerator {
                     if (salt > 0) {
                         suggested = suggested.concat("-").concat(String.valueOf(salt));
                     }
-                    if (!handler.checkUsername(suggested)) {
+                    if (!handler.existsByUsername(suggested)) {
                         return suggested;
                     }
                 }

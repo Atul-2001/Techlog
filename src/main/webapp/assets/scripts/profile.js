@@ -301,12 +301,12 @@ avatarUpload.addEventListener('submit', function (event) {
     event.preventDefault();
 
     messageIcon.classList.remove("flash-info", "flash-warn", "flash-error");
-    messageIcon.innerText = "Uploading picture";
-    messageContent.innerHTML = "<div class=\"d-flex justify-content-center\">" +
-        "<div class=\"spinner-border text-info\" style=\"width: 5rem; height: 5rem;\" role=\"status\">" +
-        "<span class=\"visually-hidden\">Loading...</span>" +
-        "</div>" +
-        "</div>";
+    messageContent.innerHTML = "<div class=\"d-flex flex-column align-items-center gap-4\">" +
+                                    "<div class=\"spinner-border text-info\" style=\"width: 5rem; height: 5rem;\" role=\"status\">" +
+                                        "<span class=\"visually-hidden\">Loading...</span>" +
+                                    "</div>" +
+                                    "<div class=\"h4 w-100 text-center\">Uploading profile picture...</div>" +
+                                "</div>";
     messageModal.show();
 
     fetch('/user/update/avatar', {

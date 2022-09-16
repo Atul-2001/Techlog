@@ -1,10 +1,8 @@
 package com.signature.techlog.controller;
 
-import com.signature.techlog.data.OTPHandler;
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
-import com.signature.techlog.model.OTP;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -42,7 +40,7 @@ public class ValidateOtpServlet extends HttpServlet {
                         .setContent("All fields are required!")
                         .toJSON());
             } else {
-                User user = UserHandler.getInstance().getUser(email);
+                User user = UserRepository.getInstance().findByEmail(email);
 
                 if (user == null) {
                     out.print(Message.builder()
@@ -57,12 +55,12 @@ public class ValidateOtpServlet extends HttpServlet {
                                 .setContent("Invalid request!")
                                 .toJSON());
                     } else {
-                        OTPHandler otpHandler = new OTPHandler();
-                        OTP otp = otpHandler.getOTP(session.getId(), user);
+                        OTPRepository otpRepository = new OTPRepository();
+                        OTP otp = otpRepository.getOTP(session.getId(), user);
 
                         if (otp.validate(Integer.parseInt(key))) {
                             otp.setValidated(true);
-                            otpHandler.saveOrUpdateOTP(otp);
+                            otpRepository.saveOrUpdateOTP(otp);
                             out.print(Message.builder()
                                     .setLevel(Message.Level.INFO)
                                     .setContent("Verification Successful!")

@@ -254,7 +254,7 @@ passwordForm.addEventListener('submit', function (event) {
                 if (result.level === Level.INFO) {
                     passwordResetAlert.classList.toggle("alert-success");
                     setTimeout(function () {
-                        window.location.href = result.redirectURI;
+                        window.location.href = result.redirect;
                     }, 1000);
                 } else if (result.level === Level.WARN) {
                     passwordResetAlert.classList.toggle("alert-warning");

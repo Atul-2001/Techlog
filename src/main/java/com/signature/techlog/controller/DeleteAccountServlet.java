@@ -1,8 +1,9 @@
 package com.signature.techlog.controller;
 
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
+import com.signature.techlog.repository.impl.UserRepositoryImpl;
 import com.signature.techlog.util.PasswordAuthentication;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -46,9 +48,9 @@ public class DeleteAccountServlet extends HttpServlet {
                     writer.print(Message.builder().setLevel(Message.Level.ERROR)
                             .setContent("Password required for authentication.").toJSON());
                 } else {
-                    UserHandler handler = UserHandler.getInstance();
+                    UserRepository handler = UserRepositoryImpl.getInstance();
 
-                    if (handler.getUserByID(user.getId()) == null) {
+                    if (handler.findById(user.getId()) == null) {
                         writer.print(Message.builder().setLevel(Message.Level.ERROR).setContent("Invalid User Request!")
                                 .toJSON());
                     } else {
@@ -92,13 +94,24 @@ public class DeleteAccountServlet extends HttpServlet {
                 writer.print(Message.builder().setLevel(Message.Level.ERROR).setContent("Invalid Request!").toJSON());
             } else {
                 User user = (User) session.getAttribute("user");
-                UserHandler handler = UserHandler.getInstance();
+                UserRepository handler = UserRepositoryImpl.getInstance();
 
-                if (handler.getUserByID(user.getId()) == null) {
+                if (handler.findById(user.getId()) == null) {
                     writer.print(Message.builder().setLevel(Message.Level.ERROR).setContent("Invalid User Request!")
                             .toJSON());
                 } else {
-                    if (handler.deleteUser(user)) {
+                    if (handler.delete(user)) {
+                        File userDir = new File(user.getHomeDirectory());
+                        if (userDir.exists()) {
+                            if (userDir.delete()) {
+                                LOGGER.info("Successfully deleted user directory - {0}", userDir.getAbsolutePath());
+                            } else {
+                                LOGGER.info("Failed to delete user directory - {0}", userDir.getAbsolutePath());
+                            }
+                        } else {
+                            LOGGER.info("User directory {0} does not exist!", userDir.getAbsolutePath());
+                        }
+
                         session.removeAttribute("user");
                         session.setAttribute("message", Message.builder().setLevel(Message.Level.INFO)
                                 .setContent("Account successfully deleted."));

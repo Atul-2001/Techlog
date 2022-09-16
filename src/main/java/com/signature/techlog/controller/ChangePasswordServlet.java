@@ -1,8 +1,9 @@
 package com.signature.techlog.controller;
 
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
+import com.signature.techlog.repository.impl.UserRepositoryImpl;
 import com.signature.techlog.util.PasswordAuthentication;
 import com.signature.techlog.util.Validator;
 import jakarta.servlet.ServletException;
@@ -19,7 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Pattern;
 
-@WebServlet(name = "Change Password Servlet", value = {"/users/password", "/account/password"})
+@WebServlet(name = "Change Password Servlet", value = {"/user/password", "/account/password"})
 public class ChangePasswordServlet extends HttpServlet {
 
     private final Logger LOGGER = LogManager.getLogger(ChangePasswordServlet.class);
@@ -29,7 +30,7 @@ public class ChangePasswordServlet extends HttpServlet {
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             switch (request.getServletPath()) {
-                case "/users/password":
+                case "/user/password":
                     out.print(validateUserNewPassword(request, response));
                     break;
                 case "/account/password":
@@ -77,8 +78,8 @@ public class ChangePasswordServlet extends HttpServlet {
                 return Message.builder().setLevel(Message.Level.ERROR).setContent("Invalid request!").toJSON();
             } else {
                 final User user = (User) session.getAttribute("user");
-                UserHandler handler = UserHandler.getInstance();
-                if (handler.getUserByID(user.getId()) == null) {
+                UserRepository handler = UserRepositoryImpl.getInstance();
+                if (handler.findById(user.getId()) == null) {
                     return Message.builder().setLevel(Message.Level.ERROR).setContent("Invalid user session!").toJSON();
                 } else {
                     final PasswordAuthentication authentication = new PasswordAuthentication();
@@ -92,7 +93,7 @@ public class ChangePasswordServlet extends HttpServlet {
                                 if (newPassword.equals(newPasswordConfirmation) &&
                                         !authentication.hash(newPassword.toCharArray()).equals(authentication.hash(newPasswordConfirmation.toCharArray()))) {
                                     user.setPassword(new PasswordAuthentication().hash(newPassword.toCharArray()));
-                                    if (handler.updateUser(user)) {
+                                    if (handler.update(user)) {
                                         session.setAttribute("user", user);
                                         return Message.builder().setLevel(Message.Level.INFO).setContent("Password changes successfully.").toJSON();
                                     } else {

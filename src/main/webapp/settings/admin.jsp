@@ -4,7 +4,7 @@
 <%@ taglib prefix="cfn" uri="/WEB-INF/tld/UserTag" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ page import="com.signature.techlog.model.AccountSettings" %>
+<%@ page import="com.signature.techlog.catalog.AccountSettings" %>
 
 <c:set var="user" value="${cfn:getSessionAttribute(pageContext.request.session, 'user')}" scope="page"/>
 <c:if test="${user == null}">
@@ -17,6 +17,7 @@
         option="${AccountSettings.ACCOUNT}">
     <jsp:attribute name="head">
         <link href="<c:url value="/assets/stylesheets/custom/techlog/account.css"/>" rel="stylesheet">
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
     </jsp:attribute>
     <jsp:attribute name="content">
         <!-- Change Username -->
@@ -106,7 +107,7 @@
         <p> Export all repositories and profile metadata for <strong>${user.username}</strong>. Exports will be available for 7 days.</p>
 
         <c:choose>
-            <c:when test="${user.requestedDataArchives.size() <= 0}">
+            <c:when test="${user.archives.size() <= 0}">
                 <form method="GET" action="<c:url value="/settings/migration"/>">
                     <input class="btn btn-sm btn-outline-secondary" type="submit" value="Start export">
                 </form>
@@ -123,7 +124,7 @@
                         </div>
                         <div class="accordion-body">
                             <ul class="list-group">
-                                <c:forEach var="archive" items="${user.requestedDataArchives}">
+                                <c:forEach var="archive" items="${user.archives}">
                                     <li class="list-group-item">${archive}</li>
                                 </c:forEach>
                                 <li class="list-group-item">An item</li>

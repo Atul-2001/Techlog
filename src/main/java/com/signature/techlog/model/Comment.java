@@ -1,67 +1,44 @@
 package com.signature.techlog.model;
 
-import com.sun.istack.NotNull;
-import jakarta.persistence.*;
+import com.signature.techlog.model.base.TimestampEntity;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Objects;
 
 @Entity
-public class Comment implements Serializable {
+@Cacheable
+@Table(name = "COMMENTS")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class Comment extends TimestampEntity {
 
     @Transient
     private static final long serialVersionUID = 4L;
 
-    @Transient
-    private static long COMMENT_COUNT = 1;
-
-    @Id
-    @Column(name = "COMMENT_ID")
-    private long id;
-
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "USER", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column(name = "USER", nullable = false, updatable = false)
     private User user;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "BLOG", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column(name = "BLOG", nullable = false, updatable = false)
     private Blog blog;
 
     @NotNull
     @Column(name = "COMMENT", nullable = false)
     private String comment;
 
-    @NotNull
-    @Column(name = "COMMENT_TIME", nullable = false)
-    private final Timestamp commentTime;
-
-    public Comment() {
-        this.commentTime = Timestamp.from(Instant.now());
-    }
-
-    public Comment(User user, Blog blog, String comment) {
-        this.id = COMMENT_COUNT++;
-        this.user = user;
-        this.blog = blog;
-        this.comment = comment;
-        this.commentTime = Timestamp.from(Instant.now());
-    }
-
-    public static void setCommentCount(long count) {
-        Comment.COMMENT_COUNT = count;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    public Comment() { }
 
     public User getUser() {
         return user;
@@ -87,21 +64,16 @@ public class Comment implements Serializable {
         this.comment = comment;
     }
 
-    public Timestamp getCommentTime() {
-        return commentTime;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Comment comment = (Comment) o;
-        return user.equals(comment.user) && blog.equals(comment.blog);
+        return Objects.equals(super.getId(), comment.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, blog);
+        return Objects.hash(super.getId());
     }
-
 }

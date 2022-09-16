@@ -1,13 +1,17 @@
 package com.signature.techlog.controller;
 
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
 import com.signature.techlog.util.Validator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,9 +80,9 @@ public class UpdateProfileServlet extends HttpServlet {
                     .toJSON();
         } else {
             User user = (User) session.getAttribute("user");
-            UserHandler handler = UserHandler.getInstance();
+            UserRepository handler = UserRepository.getInstance();
 
-            if (handler.getUserByID(user.getId()) != null) {
+            if (handler.findById(user.getId()) != null) {
                 if (name == null || name.isEmpty()) {
                     return Message.builder()
                             .setLevel(Message.Level.WARNING)
@@ -171,11 +175,11 @@ public class UpdateProfileServlet extends HttpServlet {
                     user.removeContact(User.ContactType.TWITTER);
                 }
 
-                if (handler.updateUser(user)) {
+                if (handler.update(user)) {
                     session.setAttribute("user", user);
                     return Message.builder()
                             .setLevel(Message.Level.INFO)
-                            .setContent("Profile updated successfully — <a onclick='messageModal.hide();' href='http://localhost:8080/" + user.getUsername() + "'>view your profile.</a>")
+                            .setContent("Profile updated successfully — <a onclick='messageModal.hide();' href='/" + user.getUsername() + "'>view your profile.</a>")
                             .toJSON();
                 } else {
                     return Message.builder()
@@ -201,9 +205,9 @@ public class UpdateProfileServlet extends HttpServlet {
                     .toJSON();
         } else {
             User sessionUser = (User) session.getAttribute("user");
-            UserHandler handler = UserHandler.getInstance();
+            UserRepository handler = UserRepository.getInstance();
 
-            User existingUser = handler.getUserByID(sessionUser.getId());
+            User existingUser = handler.findById(sessionUser.getId());
             if (existingUser == null) {
                 return Message.builder()
                         .setLevel(Message.Level.ERROR)
@@ -212,7 +216,7 @@ public class UpdateProfileServlet extends HttpServlet {
             } else {
                 if (!existingUser.isEmailVerified() && !sessionUser.isEmailVerified()) {
                     existingUser.setEmailVerified(Boolean.TRUE);
-                    if (handler.updateUser(existingUser)) {
+                    if (handler.update(existingUser)) {
                         sessionUser.setEmailVerified(Boolean.TRUE);
                         session.setAttribute("user", sessionUser);
                         return Message.builder()
@@ -244,27 +248,42 @@ public class UpdateProfileServlet extends HttpServlet {
                     .toJSON();
         } else {
             User user = (User) session.getAttribute("user");
-            UserHandler handler = UserHandler.getInstance();
+            UserRepository handler = UserRepository.getInstance();
 
-            if (handler.getUserByID(user.getId()) == null) {
+            if (handler.findById(user.getId()) == null) {
                 return Message.builder()
                         .setLevel(Message.Level.ERROR)
                         .setContent("Invalid user request!")
                         .toJSON();
             } else {
+                File oldProfile = null;
+                if (!user.getProfile().startsWith("http")) {
+                    oldProfile = new File(user.getProfile());
+                }
                 switch (user.getGender()) {
                     case "FEMALE":
-                        user.setProfile("/assets/images/user_icon/female-user.svg");
+                        user.setProfile("app.user.profile.female");
                         break;
                     case "MALE":
-                        user.setProfile("/assets/images/user_icon/male-user.svg");
+                        user.setProfile("app.user.profile.male");
                         break;
                     default:
-                        user.setProfile("/assets/images/user_icon/transgender-user.svg");
+                        user.setProfile("app.user.profile.transgender");
                         break;
                 }
 
-                if (handler.updateUser(user)) {
+                if (handler.update(user)) {
+                    if (oldProfile != null) {
+                        if (oldProfile.exists()) {
+                            if (oldProfile.delete()) {
+                                LOGGER.info("File {0} successfully deleted", oldProfile.getAbsolutePath());
+                            } else {
+                                LOGGER.info("Failed to delete file {0}", oldProfile.getAbsolutePath());
+                            }
+                        } else {
+                            LOGGER.info("File {0} does not exist!", oldProfile.getAbsolutePath());
+                        }
+                    }
                     session.setAttribute("user", user);
                     return Message.builder()
                             .setLevel(Message.Level.INFO)
@@ -291,9 +310,9 @@ public class UpdateProfileServlet extends HttpServlet {
                     .toJSON();
         } else {
             User user = (User) session.getAttribute("user");
-            UserHandler handler = UserHandler.getInstance();
+            UserRepository handler = UserRepository.getInstance();
 
-            if (handler.getUserByID(user.getId()) == null) {
+            if (handler.findById(user.getId()) == null) {
                 return Message.builder()
                         .setLevel(Message.Level.ERROR)
                         .setContent("Invalid user request!")
@@ -301,7 +320,7 @@ public class UpdateProfileServlet extends HttpServlet {
             } else {
                 if (profile != null) {
                     try {
-                        File avatarDir = new File(user.getContentDirectory() + File.separator + "avatar");
+                        File avatarDir = new File(user.getHomeDirectory() + File.separator + "avatar");
                         if (avatarDir.exists()) {
                             new File(user.getProfile()).deleteOnExit();
                         } else {
@@ -312,7 +331,7 @@ public class UpdateProfileServlet extends HttpServlet {
                         profile.write(avatarPath);
 
                         user.setProfile(avatarPath);
-                        if (handler.updateUser(user)) {
+                        if (handler.update(user)) {
                             session.setAttribute("user", user);
                             return Message.builder()
                                     .setLevel(Message.Level.INFO)
@@ -347,4 +366,5 @@ public class UpdateProfileServlet extends HttpServlet {
         String fileExt = fileNamePart[fileNamePart.length - 1];
         return Integer.toUnsignedString(fileName.hashCode()) + "." + fileExt;
     }
+
 }

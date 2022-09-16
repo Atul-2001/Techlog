@@ -57,7 +57,7 @@ if (changePasswordForm) {
 
                 const form = new FormData();
                 form.append("user[password]", event.target.value);
-                fetch('/users/password', {
+                fetch('/user/password', {
                     method: "POST",
                     body: new URLSearchParams(form.entries())
                 })

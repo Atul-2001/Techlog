@@ -122,5 +122,4 @@ public class SequenceGenerator {
         nodeId = nodeId & maxNodeId;
         return nodeId;
     }
-
 }

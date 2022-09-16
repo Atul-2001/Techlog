@@ -1,10 +1,8 @@
 package com.signature.techlog.controller;
 
-import com.signature.techlog.data.OTPHandler;
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
-import com.signature.techlog.model.OTP;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
 import com.signature.techlog.util.PasswordAuthentication;
 import com.signature.techlog.util.Validator;
 import jakarta.servlet.ServletException;
@@ -64,8 +62,8 @@ public class ResetPasswordServlet extends HttpServlet {
                             .setContent("Invalid Request!")
                             .toJSON());
                 } else {
-                    UserHandler handler = UserHandler.getInstance();
-                    User user = handler.getUser(email);
+                    UserRepository handler = UserRepository.getInstance();
+                    User user = handler.findByEmail(email);
 
                     if (user == null) {
                         out.print(Message.builder()
@@ -73,7 +71,7 @@ public class ResetPasswordServlet extends HttpServlet {
                                 .setContent("Invalid Request!")
                                 .toJSON());
                     } else {
-                        OTP otp = new OTPHandler().getOTP(session.getId(), user);
+                        OTP otp = new OTPRepository().getOTP(session.getId(), user);
                         if (otp == null || !otp.isValidated()) {
                             out.print(Message.builder()
                                     .setLevel(Message.Level.ERROR)
@@ -83,19 +81,19 @@ public class ResetPasswordServlet extends HttpServlet {
                             PasswordAuthentication authentication = new PasswordAuthentication();
                             user.setPassword(authentication.hash(password.toCharArray()));
 
-                            if (handler.updateUser(user)) {
+                            if (handler.update(user)) {
                                 if (session.getAttribute("user") == null) {
                                     session.invalidate();
                                     out.print(Message.builder()
                                             .setLevel(Message.Level.INFO)
                                             .setContent("Password changed successfully! Redirecting...")
-                                            .setRedirectURI("/login")
+                                            .setRedirect("/login")
                                             .toJSON());
                                 } else {
                                     out.print(Message.builder()
                                             .setLevel(Message.Level.INFO)
                                             .setContent("Password changed successfully! Redirecting...")
-                                            .setRedirectURI("/home")
+                                            .setRedirect("/home")
                                             .toJSON());
                                 }
                             } else {

@@ -1,10 +1,8 @@
 package com.signature.techlog.controller;
 
-import com.signature.techlog.data.OTPHandler;
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
-import com.signature.techlog.model.OTP;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
 import com.signature.techlog.util.EmailContent;
 import com.signature.techlog.util.MailUtil;
 import jakarta.mail.internet.MimeMessage;
@@ -57,7 +55,7 @@ public class VerifyEmailServlet extends HttpServlet {
                         .setContent("All fields are required!")
                         .toJSON());
             } else {
-                User user = UserHandler.getInstance().getUser(email);
+                User user = UserRepository.getInstance().findByEmail(email);
 
                 if (user == null) {
                     out.print(Message.builder()
@@ -67,7 +65,7 @@ public class VerifyEmailServlet extends HttpServlet {
                 } else {
                     HttpSession session = getSession(req);
                     OTP otp = new OTP(session.getId(), user.getId(), user.getEmail());
-                    OTPHandler otpHandler = new OTPHandler();
+                    OTPRepository otpRepository = new OTPRepository();
 
                     Map<String, String> data = new HashMap<>();
                     data.put("user", user.getName());
@@ -79,7 +77,7 @@ public class VerifyEmailServlet extends HttpServlet {
                     try {
                         final String SUBJECT = "Account verification code";
                         MimeMessage message = MailUtil.createEmail(user.getEmail(), SUBJECT, EmailContent.getPasswordResetTemplate(data));
-                        if (MailUtil.sendMessage(message) && otpHandler.saveOrUpdateOTP(otp)) {
+                        if (MailUtil.sendMessage(message) && otpRepository.saveOrUpdateOTP(otp)) {
                             out.print(Message.builder()
                                     .setLevel(Message.Level.INFO)
                                     .setContent("OTP sent successfully!")

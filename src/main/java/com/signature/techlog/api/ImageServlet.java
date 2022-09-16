@@ -1,7 +1,9 @@
 package com.signature.techlog.api;
 
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
+import com.signature.techlog.repository.impl.UserRepositoryImpl;
+import com.signature.techlog.util.ApplicationProperties;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,9 +32,9 @@ public class ImageServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             User user = (User) session.getAttribute("user");
-            UserHandler handler = UserHandler.getInstance();
+            UserRepository handler = null/*UserRepositoryImpl.getInstance()*/;
 
-            if (handler.getUserByID(user.getId()) == null) {
+            if (handler.findById(user.getId()) == null) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
                 try {
@@ -40,13 +42,9 @@ public class ImageServlet extends HttpServlet {
                     String filepath = user.getProfile();
                     if (filepath.startsWith("http")) {
                         new URL(filepath).openConnection().getInputStream().transferTo(response.getOutputStream());
-                    } else if (filepath.startsWith("/assets/images/")) {
-                        response.setHeader("Content-Type", getServletContext().getMimeType(filepath));
-                        new URL("http://localhost:8080/" + filepath).openConnection().getInputStream()
-                                .transferTo(response.getOutputStream());
                     } else {
-                        if (filepath.startsWith("/assets/images/")) {
-                            filepath = System.getProperty("user.home").concat(File.separator).concat("Techlog").concat(filepath);
+                        if (filepath.startsWith("app.user.profile")) {
+                            filepath = ApplicationProperties.getProperty("app.dir").concat(ApplicationProperties.getProperty(filepath));
                         }
                         File file = new File(filepath);
                         response.setHeader("Content-Type", getServletContext().getMimeType(filepath));

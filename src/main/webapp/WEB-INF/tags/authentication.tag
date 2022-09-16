@@ -1,6 +1,7 @@
 <%@ tag description="Authentication Page template" pageEncoding="UTF-8" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="cfn" uri="/WEB-INF/tld/UserTag" %>
 <%@ attribute name="title" required="true" rtexprvalue="true" %>
 <%@ attribute name="script" fragment="true" %>
 
@@ -11,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <script src="https://kit.fontawesome.com/4418ec4da8.js" crossorigin="anonymous"></script>
     <script src="<c:url value="/assets/scripts/level.js"/>"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="<c:url value="/assets/stylesheets/custom/techlog/auth.css"/>"/>
     <title>${title}</title>
 </head>
@@ -47,9 +49,13 @@
                 </button>
                 <p class="social-text">Or Sign in with social platforms</p>
                 <div class="social-media">
-                    <a id="google-sign-in-btn" class="social-icon">
-                        <i class="fab fa-google"></i>
-                    </a>
+                    <div id="g_id_onload" data-client_id="${cfn:getProperty("app.credentials.google.client.id")}" data-context="signin"
+                         data-ux_mode="popup" data-callback="handleCredentialResponseFromGoogleLogin" data-auto_prompt="false">
+                    </div>
+
+                    <div class="g_id_signin" data-type="icon" data-shape="circle"
+                         data-theme="filled_blue" data-text="signin_with_google" data-size="large">
+                    </div>
                     <a class="social-icon">
                         <i class="fab fa-facebook-f"></i>
                     </a>
@@ -106,9 +112,9 @@
                 </button>
                 <p class="social-text">Or Sign up with social platforms</p>
                 <div class="social-media">
-                    <a id="google-sign-up-btn" class="social-icon">
-                        <i class="fab fa-google"></i>
-                    </a>
+                    <div class="g_id_signin" data-type="icon" data-shape="circle"
+                         data-theme="filled_blue" data-text="signup_with_google" data-size="large">
+                    </div>
                     <a class="social-icon">
                         <i class="fab fa-facebook-f"></i>
                     </a>
@@ -153,7 +159,15 @@
 </div>
 
 <script src="<c:url value="/assets/scripts/app.js"/>"></script>
+<script>
+    window.onload = function () {
+        google.accounts.id.initialize({
+            client_id: '${cfn:getProperty("app.credentials.google.client.id")}',
+            callback: handleCredentialResponseFromGoogleRegister
+        });
+        google.accounts.id.prompt();
+    };
+</script>
 <jsp:invoke fragment="script"/>
-<script src="https://apis.google.com/js/api:client.js?onload=onLoadCallback" async defer></script>
 </body>
 </html>

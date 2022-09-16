@@ -1,65 +1,46 @@
 package com.signature.techlog.model;
 
-import com.sun.istack.NotNull;
-import jakarta.persistence.*;
+import com.signature.techlog.model.base.TimestampEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Objects;
 
 @Entity
-public class Archive implements Serializable {
+@Table(name = "ARCHIVES")
+public class Archive extends TimestampEntity {
 
     @Transient
-    private static final long serialVersionUID = 6L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private static final long serialVersionUID = 5L;
 
     @NotNull
-    @Column(name = "NAME", nullable = false)
+    @Column(name = "NAME", nullable = false, updatable = false)
     private String name;
 
     @NotNull
-    @Column(name = "SIZE", nullable = false)
+    @Column(name = "SIZE", nullable = false, updatable = false)
     private int size;
 
     @NotNull
-    @Column(name = "LOCATION", nullable = false)
+    @Column(name = "LOCATION", nullable = false, updatable = false)
     private String location;
-
-    @NotNull
-    @Column(name = "DATE_CREATED", nullable = false)
-    private Timestamp dateCreated;
 
     @NotNull
     @Column(name = "IS_EXPIRED", nullable = false)
     private boolean isExpired;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "USER", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column(name = "USER", nullable = false, updatable = false)
     private User user;
 
-    public Archive() {}
-
-    public Archive(String name, int size, String location) {
-        this.name = name;
-        this.size = size;
-        this.location = location;
-        this.dateCreated = Timestamp.from(Instant.now());
-        this.isExpired = false;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    public Archive() { }
 
     public String getName() {
         return name;
@@ -85,14 +66,6 @@ public class Archive implements Serializable {
         this.location = location;
     }
 
-    public Timestamp getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Timestamp dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
     public boolean isExpired() {
         return isExpired;
     }
@@ -114,23 +87,23 @@ public class Archive implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Archive archive = (Archive) o;
-        return id == archive.id;
+        return Objects.equals(super.getId(), archive.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(super.getId());
     }
 
     @Override
     public String toString() {
         return "Archive {" +
-                "\n\tid=" + id +
-                "\n\tname='" + name + '\'' +
-                "\n\tsize=" + size +
-                "\n\tlocation='" + location + '\'' +
-                "\n\tdateCreated=" + dateCreated +
-                "\n\tisExpired=" + isExpired +
+                "\n\tid: " + super.getId() +
+                "\n\tname: " + name +
+                "\n\tsize: " + size +
+                "\n\tlocation: " + location +
+                "\n\tdateCreated: " + super.getTimestamp() +
+                "\n\tisExpired: " + isExpired +
                 "\n}";
     }
 }

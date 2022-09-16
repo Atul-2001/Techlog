@@ -1,6 +1,7 @@
-package com.signature.techlog.model;
+package com.signature.techlog.catalog;
 
 public enum AccountSettings {
+
     PROFILE,
     ACCOUNT,
     ACCOUNT_SECURITY,

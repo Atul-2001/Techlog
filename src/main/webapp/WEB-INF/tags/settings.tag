@@ -4,7 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ attribute name="title" required="true" rtexprvalue="true" %>
 <%@ attribute name="user" required="true" type="com.signature.techlog.model.User" %>
-<%@ attribute name="option" required="true" type="com.signature.techlog.model.AccountSettings" %>
+<%@ attribute name="option" required="true" type="com.signature.techlog.catalog.AccountSettings" %>
 <%@ attribute name="head" fragment="true" %>
 <%@ attribute name="content" fragment="true" %>
 <%@ attribute name="modal" fragment="true" %>
@@ -60,13 +60,6 @@
             </div>
         </main>
 
-        <%--
-        <i class="far fa-check-circle"></i> // empty
-        <i class="fas fa-check-circle"></i> // filled
-        <i class="fas fa-info-circle"></i>
-        <i class="fas fa-exclamation-triangle"></i>
-        <i class="fas fa-exclamation-circle"></i>
-        --%>
         <div id="message-modal" class="modal modal-overlay-dark" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -79,7 +72,7 @@
                             <i class="fas fa-info-circle d-none octicon octicon-info"></i>
                             <i class="fas fa-exclamation-circle d-none octicon octicon-warn"></i>
                             <i class="fas fa-exclamation-triangle d-none octicon octicon-alert"></i>
-                            <p id="message-content"></p>
+                            <p id="message-content" class="w-100"></p>
                         </div>
                     </div>
                     <div class="modal-footer">

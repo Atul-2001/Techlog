@@ -16,27 +16,22 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
-public class IDTokenVerifier {
+public class TokenVerifier {
 
-    private static final Logger LOGGER = LogManager.getLogger(IDTokenVerifier.class);
+    private static final Logger LOGGER = LogManager.getLogger(TokenVerifier.class);
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String CLIENT_ID = "[YOUR CLIENT ID]";
+    private static final String CLIENT_ID = ApplicationProperties.getProperty("app.credentials.google.client.id");
 
-    public static User verifyGoogleIdToken(String idTokenString) {
+    public static User verifyGoogleCredential(String credential) {
         try {
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(HTTP_TRANSPORT, JSON_FACTORY)
-                    // Specify the CLIENT_ID of the app that accesses the backend:
                     .setAudience(Collections.singletonList(CLIENT_ID))
-                    // Or, if multiple clients access the backend:
-                    //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
                     .build();
 
-            // (Receive idTokenString by HTTPS POST)
-
-            GoogleIdToken idToken = verifier.verify(idTokenString);
+            GoogleIdToken idToken = verifier.verify(credential);
             if (idToken != null) {
                 try {
                     GoogleIdToken.Payload payload = idToken.getPayload();
@@ -55,7 +50,7 @@ public class IDTokenVerifier {
                     return null;
                 }
             } else {
-                LOGGER.log(Level.TRACE, "Invalid ID token. Token: " + idTokenString);
+                LOGGER.log(Level.TRACE, "Invalid ID token. Token: " + credential);
                 return null;
             }
         } catch (IOException | GeneralSecurityException ex) {

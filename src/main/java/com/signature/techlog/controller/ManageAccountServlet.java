@@ -1,8 +1,8 @@
 package com.signature.techlog.controller;
 
-import com.signature.techlog.data.UserHandler;
 import com.signature.techlog.model.Message;
 import com.signature.techlog.model.User;
+import com.signature.techlog.repository.UserRepository;
 import com.signature.techlog.util.Validator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,7 +36,7 @@ public class ManageAccountServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
                 User user = (User) session.getAttribute("user");
-                UserHandler handler = UserHandler.getInstance();
+                UserRepository handler = UserRepository.getInstance();
                 if (user.getUsername() != null && user.getUsername().equals(given_username)) {
                     resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 } else if (handler.checkUsername(given_username)) {
@@ -54,7 +54,7 @@ public class ManageAccountServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
-        if (req.getServletPath().equals("/users/username/rename")) {
+        if (req.getServletPath().equals("/user/username/rename")) {
             try (PrintWriter writer = resp.getWriter()) {
                 HttpSession session = req.getSession(false);
                 if (session == null || session.getAttribute("user") == null) {
@@ -72,14 +72,14 @@ public class ManageAccountServlet extends HttpServlet {
                                 .toJSON());
                     } else {
                         User user = (User) session.getAttribute("user");
-                        UserHandler handler = UserHandler.getInstance();
+                        UserRepository handler = UserRepository.getInstance();
 
                         if (handler.checkUsername(given_username)) {
                             writer.print(Message.builder().setLevel(Message.Level.ERROR)
                                     .setContent("Username must be different.").toJSON());
                         } else {
                             user.setUsername(given_username);
-                            if (handler.updateUser(user)) {
+                            if (handler.update(user)) {
                                 session.setAttribute("user", user);
                                 writer.print(Message.builder().setLevel(Message.Level.INFO).setContent(
                                         "Username updated successfully — <a onclick='messageModal.hide();' href='http://localhost:8080/"
@@ -93,6 +93,10 @@ public class ManageAccountServlet extends HttpServlet {
                     }
                 }
             }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            LOGGER.log(Level.TRACE, "Request failed for : " + req.getRequestURL());
         }
     }
+    
 }

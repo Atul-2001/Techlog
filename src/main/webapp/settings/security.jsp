@@ -4,7 +4,7 @@
 <%@ taglib prefix="cfn" uri="/WEB-INF/tld/UserTag" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ page import="com.signature.techlog.model.AccountSettings" %>
+<%@ page import="com.signature.techlog.catalog.AccountSettings" %>
 
 <c:set var="user" value="${cfn:getSessionAttribute(pageContext.request.session, 'user')}" scope="page"/>
 <c:if test="${user == null}">

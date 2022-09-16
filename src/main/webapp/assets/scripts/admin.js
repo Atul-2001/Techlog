@@ -141,9 +141,10 @@ if (deleteWarningDialog) {
             spinner.classList.remove("d-none");
 
             messageIcon.classList.remove("flash-info", "flash-warn", "flash-error");
+            const formData = new FormData(event.target);
             fetch('/user/account/delete', {
                 method: "POST",
-                body: new URLSearchParams(new FormData(event.target).entries())
+                body: new URLSearchParams(formData.entries())
             })
                 .then(response => {
                     response.json().then(result => {
@@ -155,6 +156,15 @@ if (deleteWarningDialog) {
                                 response.json().then(result => {
                                     messageContent.innerHTML = result.content;
                                     if (result.level === Level.INFO) {
+                                        if (!formData.get('sudo_password')) {
+                                            google.accounts.id.revoke(`${formData.get('sudo_login')}`, done => {
+                                                if (done.successful) {
+                                                    console.log('consent revoked');
+                                                } else {
+                                                    console.log(done.error);
+                                                }
+                                            });
+                                        }
                                         messageIcon.classList.add("flash-info");
                                         setTimeout(() => {
                                             location.assign("/");

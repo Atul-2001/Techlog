@@ -16,6 +16,18 @@
             com.signature.techlog.model.User getSessionAttribute(jakarta.servlet.http.HttpSession,java.lang.String)</function-signature>
     </function>
 
+    <function>
+        <name>getProperty</name>
+        <function-class>com.signature.techlog.jstl.function.FetchProperties</function-class>
+        <function-signature>java.lang.String getProperty(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <name>getPropertyOrDefault</name>
+        <function-class>com.signature.techlog.jstl.function.FetchProperties</function-class>
+        <function-signature>java.lang.String getProperty(java.lang.String,java.lang.String)</function-signature>
+    </function>
+
     <!-- Invoke 'Generate' action to add tags or functions -->
 
 </taglib>

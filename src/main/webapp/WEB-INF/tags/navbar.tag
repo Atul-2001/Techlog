@@ -59,14 +59,18 @@
                     </jsp:attribute>
                     <jsp:attribute name="navbar_nav_end">
                         <li class="nav-item d-lg-none border-top border-lg-top-0 border-white-fade">
+                            <a class="nav-link" href="<c:url value="/settings/profile"/>"><i class="fas fa-cog me-1"></i>Settings</a>
+                        </li>
+                        <li class="nav-item d-lg-none border-top border-lg-top-0 border-white-fade">
                             <a class="nav-link" href="#">
                                 <img src="<c:url value="/user/profile/${user.id}"/>" alt="${user.username}" class="user-avatar-sm rounded-circle me-1">
                                     ${user.name}
                             </a>
                         </li>
                         <li class="nav-item d-lg-none border-top border-lg-top-0 border-white-fade">
-                            <a class="nav-link" href="<c:url value="/user/logout"/>" onclick="signOut()">
-                                <i class="fas fa-sign-out-alt ms-2 me-2"></i>Sign out</a>
+                            <a class="nav-link" href="<c:url value="/user/logout"/>">
+                                <i class="fas fa-sign-out-alt ms-2 me-2"></i>Sign out
+                            </a>
                         </li>
                     </jsp:attribute>
                     <jsp:attribute name="navbar_collapse_end">
@@ -152,8 +156,9 @@
                                     <div role="none" class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="<c:url value="/settings/profile"/>"><i class="fas fa-cog me-1"></i>Setting</a>
                                     <div role="none" class="dropdown-divider"></div>
-                                    <a class="dropdown-item mb-1" href="<c:url value="/user/logout"/>"
-                                       onclick="signOut()"><i class="fas fa-power-off me-1"></i>Logout</a>
+                                    <a class="dropdown-item mb-1" href="<c:url value="/user/logout"/>">
+                                        <i class="fas fa-power-off me-1"></i>Logout
+                                    </a>
                                 </div>
                             </li>
                         </ul>
